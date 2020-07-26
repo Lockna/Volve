@@ -21,7 +21,7 @@ pub struct Registers {
 
 impl Registers {
 
-    fn new() -> Registers {
+    pub fn new() -> Registers {
 
         Registers {
 
