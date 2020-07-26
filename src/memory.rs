@@ -39,9 +39,9 @@ impl Memory {
         upper << 8 | lower
     }
 
-    fn write_word(&mut self, addr: u16, val: u8) {
-        self.write_byte(addr, val);
-        self.write_byte(addr, (val >> 8));
+    fn write_word(&mut self, addr: u16, val: u16) {
+        self.write_byte(addr, val as u8);
+        self.write_byte(addr + 1, (val >> 8) as u8);
     }
 
 }
