@@ -33,15 +33,26 @@ impl Memory {
         self.bytes[address as usize] = value;
     }
 
-    fn read_word(&self, addr: u16) -> u8 {
+    pub fn read_word(&self, addr: u16) -> u8 {
         let lower = self.read_byte(addr) as u8;
         let upper = self.read_byte(addr + 1) as u8;
-        upper << 8 | lower
+        //upper << 8 | lower
+        8
     }
 
-    fn write_word(&mut self, addr: u16, val: u16) {
+    pub fn write_word(&mut self, addr: u16, val: u16) {
         self.write_byte(addr, val as u8);
         self.write_byte(addr + 1, (val >> 8) as u8);
+    }
+
+    pub fn print_mem(&self) {
+
+        for byte in self.bytes.iter() {
+
+            println!("{:#04x}", byte);
+
+        }
+
     }
 
 }
