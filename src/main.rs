@@ -9,6 +9,4 @@ fn main() {
 
     code::upload_to_rom(&mut cpu, binary);
 
-    cpu.memory.print_mem();
-
 }

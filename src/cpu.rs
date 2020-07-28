@@ -17,4 +17,24 @@ impl Cpu {
 
     }
 
+    pub fn run(&mut self) {
+        self.registers.pc = self.memory[0xFFFD] * 256 + self.memory[0xFFFC];
+
+
+
+    }
+
+    pub fn fetch_insn(&mut self) -> u8 {
+        self.memory.read_byte(self.registers.pc)
+    }
+
+    pub fn decode_insn(&self) {
+        // unimplemented
+    }
+
+    pub fn execute_insn(&self, ) {
+        // unimplemented
+    }
+
+
 }
