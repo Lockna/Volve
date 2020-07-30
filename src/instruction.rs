@@ -6,6 +6,7 @@ pub enum AddressingMode {
     ZeroPageX,
     ZeroPageY,
     Relative,
+    Stack,
     Absolute,
     AbsoluteX,
     AbsoluteY,
@@ -21,10 +22,15 @@ pub enum Operand {
     Address(u16),
     Relative(i8),
     Implied,
+    None,
 }
 
 pub enum OpCode {
-    // unimplemented
+    ADC, AND, ASL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL, BRK, BVC, BVS, CLC, CLD, CLI,
+    CLV, CMP, CPX, CPY, DCP, DEC, DEX, DEY, EOR, INC, INX, INY, ISB, JMP, JSR, LAX,
+    LDA, LDX, LDY, LSR, NOP, ORA, PHA, PHP, PLA, PLP, RLA, ROL, ROR, RRA, RTI, RTS,
+    SAX, SBC, SEC, SED, SEI, SLO, SRE, STA, STX, STY, TAX, TAY, TSX, TXA, TXS, TYA,
+    ___
 }
 
 pub struct Instruction {

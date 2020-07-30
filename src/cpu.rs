@@ -1,5 +1,7 @@
 use crate::registers::Registers;
 use crate::memory::Memory;
+use crate::instruction::{Instruction, OpCode, Operand, AddressingMode};
+
 
 pub struct Cpu {
     pub registers: Registers,
@@ -19,21 +21,37 @@ impl Cpu {
 
     pub fn run(&mut self) {
         self.registers.pc = self.memory[0xFFFD] * 256 + self.memory[0xFFFC];
+        let mut bytecode;
+        let mut insn;
 
+        loop {
 
+            bytecode = self.fetch_insn();
+            insn = self.decode_opcode(opcode_byte);
+            self.execute_insn(insn);
+
+        }
 
     }
 
-    pub fn fetch_insn(&mut self) -> u8 {
+    fn fetch_insn(&mut self) -> u8 {
         self.memory.read_byte(self.registers.pc)
     }
 
-    pub fn decode_insn(&self) {
-        // unimplemented
+    fn decode_bytecode(&self, bytecode: u8) -> Instruction {
+
+        match bytecode {
+
+            0x00 => Instruction { operand: Operand::None, mode: AddressingMode::Stack, opcode: OpCode::BRK },
+            0x01 => Instruction { operand: Operand::XRegister, mode: AddressingMode::IndexedIndirectX, opcode: OpCode::ORA },
+            // do the same for the rest
+            _ => None
+        }
+
     }
 
-    pub fn execute_insn(&self, ) {
-        // unimplemented
+    pub fn execute_insn(&self, insn: Instruction) {
+
     }
 
 
