@@ -21,7 +21,7 @@ impl Cpu {
     }
 
     pub fn run(&mut self) {
-        self.registers.pc = (self.memory.read_byte(0xFFFD) as u16 * 256 + self.memory.read_byte(0xFFFC) as u16);
+        self.registers.pc = self.memory.read_word(0xFFFC);
         let mut bytecode;
         let mut insn;
 
