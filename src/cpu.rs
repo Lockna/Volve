@@ -1,6 +1,7 @@
 use crate::registers::Registers;
 use crate::memory::Memory;
-use crate::instruction::{Instruction, OpCode, Operand, AddressingMode};
+use crate::instruction::{Instruction, AddressingMode, OP_CODES};
+use std::ops::Index;
 
 
 pub struct Cpu {
@@ -20,14 +21,14 @@ impl Cpu {
     }
 
     pub fn run(&mut self) {
-        self.registers.pc = self.memory[0xFFFD] * 256 + self.memory[0xFFFC];
+        self.registers.pc = (self.memory.read_byte(0xFFFD) as u16 * 256 + self.memory.read_byte(0xFFFC) as u16);
         let mut bytecode;
         let mut insn;
 
         loop {
 
             bytecode = self.fetch_insn();
-            insn = self.decode_opcode(opcode_byte);
+            insn = self.decode_bytecode(bytecode);
             self.execute_insn(insn);
 
         }
@@ -39,15 +40,7 @@ impl Cpu {
     }
 
     fn decode_bytecode(&self, bytecode: u8) -> Instruction {
-
-        match bytecode {
-
-            0x00 => Instruction { operand: Operand::None, mode: AddressingMode::Stack, opcode: OpCode::BRK },
-            0x01 => Instruction { operand: Operand::XRegister, mode: AddressingMode::IndexedIndirectX, opcode: OpCode::ORA },
-            // do the same for the rest
-            _ => None
-        }
-
+        OP_CODES[bytecode as usize].expect("Invalid instruction hit!")
     }
 
     pub fn execute_insn(&self, insn: Instruction) {
