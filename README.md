@@ -13,5 +13,5 @@ If something isn't working as expected or you have questions, feel free to open 
 If you are looking for a more direct way to contact me, you are welcome to send me an e-mail
 
 # License
-Volve is distributed under the terms of MIT license.
-See [LICENSE](LICENSE)
+Volve is distributed under the terms of either Apache License Version 2.0 or the MIT license, at the user's choice.
+See [LICENSE-MIT](LICENSE-MIT) or [LICENSE-APACHE](LICENSE-APACHE)
