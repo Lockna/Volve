@@ -1,5 +1,5 @@
 [package]
-name = "Volve"
+name = "volve"
 version = "0.1.0"
 authors = ["Raphael O. <raphael.ob@protonmail.com>"]
 edition = "2018"

@@ -34,9 +34,9 @@ impl Memory {
     }
 
     pub fn read_word(&self, addr: u16) -> u16 {
-        let lower = self.read_byte(addr) as u8;
-        let upper = self.read_byte(addr + 1) as u8;
-        (upper << 8 | lower) as u16
+        let lower = self.read_byte(addr) as u16;
+        let upper = self.read_byte(addr + 1) as u16;
+        upper << 8 | lower
     }
 
     pub fn write_word(&mut self, addr: u16, val: u16) {

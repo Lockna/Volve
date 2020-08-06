@@ -1,7 +1,7 @@
+use std::ops::Not;
 use crate::registers::Registers;
 use crate::memory::Memory;
 use crate::instruction::{Instruction, AddressingMode, OP_CODES};
-use std::ops::Index;
 
 
 pub struct Cpu {
@@ -22,17 +22,26 @@ impl Cpu {
 
     pub fn run(&mut self) {
         self.registers.pc = self.memory.read_word(0xFFFC);
-        let mut bytecode;
-        let mut insn;
 
-        loop {
-
-            bytecode = self.fetch_insn();
-            insn = self.decode_bytecode(bytecode);
-            self.execute_insn(insn);
-
+        while self.is_finished().not() {
+            self.step()
         }
 
+    }
+
+    fn is_finished(&mut self) -> bool {
+        // cpu shutdowns when invalid opcode is hit
+        if (self.fetch_insn() & 0xF == 0x2) {
+            true
+        } else {
+            false
+        }
+    }
+
+    fn step(&mut self) {
+        let bytecode = self.fetch_insn();
+        let insn = self.decode_bytecode(bytecode);
+        self.execute_insn(insn);
     }
 
     fn fetch_insn(&mut self) -> u8 {

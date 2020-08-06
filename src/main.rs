@@ -1,5 +1,5 @@
 use std::env;
-use Volve::{cpu::Cpu, code};
+use volve::{cpu::Cpu, code};
 
 fn main() {
 
