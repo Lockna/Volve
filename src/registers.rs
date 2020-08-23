@@ -21,6 +21,20 @@ pub struct Registers {
 
 impl Registers {
 
+    
+    pub fn set_flag(&mut self, flag: StatusFlag, mode: bool) {
+        if mode {
+            self.p |= flag as u8;
+        } else {
+            self.p &= !(flag as u8);
+        }
+    }
+
+    pub fn get_flag(&mut self, flag: StatusFlag) -> bool {
+        (self.p & flag as u8) != 0
+    }
+
+
     pub fn new() -> Registers {
 
         Registers {
