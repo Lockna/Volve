@@ -31,7 +31,7 @@ impl Cpu {
 
     fn is_finished(&mut self) -> bool {
         // cpu shutdowns when invalid opcode is hit
-        if (self.fetch_insn() & 0xF == 0x2) {
+        if (OP_CODES[self.fetch_insn() as usize].is_none()) {
             true
         } else {
             false
