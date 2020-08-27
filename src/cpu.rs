@@ -1,5 +1,5 @@
 use std::ops::Not;
-use crate::registers::Registers;
+use crate::registers::{Registers, StatusFlag};
 use crate::memory::Memory;
 use crate::instruction::{Instruction, AddressingMode, OP_CODES, OpCode};
 
@@ -124,6 +124,51 @@ impl Cpu {
     }
     // TODO: implement the instructions
     fn adc(&mut self, mode: AddressingMode) {
+
+            match mode {
+
+                AddressingMode::Absolute => {
+
+                    let operand = self.memory.read_byte(self.memory.read_word(self.registers.pc+1) as u16);
+
+                    self.registers.a = self.registers.a + operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
+                }
+
+                AddressingMode::AbsoluteX => {
+
+                    let specified_addr = self.memory.read_byte(self.memory.read_word(self.registers.pc+1) as u16);
+                    let sum_addr = specified_addr + self.registers.x;
+                    let operand = self.memory.read_byte(sum_addr as u16);
+
+                    self.registers.a = self.registers.a + operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
+                }
+
+                AddressingMode::AbsoluteY => {
+                    let specified_addr = self.memory.read_byte(self.memory.read_word(self.registers.pc+1) as u16);
+                    let sum_addr = specified_addr + self.registers.y;
+                    let operand = self.memory.read_byte(sum_addr as u16);
+
+                    self.registers.a = self.registers.a + operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
+                }
+
+                AddressingMode::Immediate => {
+                    let operand = self.memory.read_byte(self.registers.pc+1);
+                }
+
+                AddressingMode::ZeroPage => {
+                    let operand = self.memory.read_byte(self.memory.read_byte(self.registers.pc+1) as u16);
+
+                    self.registers.a = self.registers.a + operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
+                }
+
+                AddressingMode::ZeroPageX => {
+                    let specified_addr = self.memory.read_byte(self.registers.pc+1) as u16;
+                    let sum_addr = specified_addr + self.registers.x as u16;
+
+                    
+                }
+
+            }
 
     }
 
