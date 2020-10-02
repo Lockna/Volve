@@ -1,8 +1,7 @@
-use std::ops::Not;
-use crate::registers::{Registers, StatusFlag};
+use crate::instruction::{AddressingMode, Instruction, OpCode, OP_CODES};
 use crate::memory::Memory;
-use crate::instruction::{Instruction, AddressingMode, OP_CODES, OpCode};
-
+use crate::registers::{Registers, StatusFlag};
+use std::ops::Not;
 
 pub struct Cpu {
     pub registers: Registers,
@@ -10,14 +9,11 @@ pub struct Cpu {
 }
 
 impl Cpu {
-
     pub fn new() -> Cpu {
-
         Cpu {
             registers: Registers::new(),
             memory: Memory::new(),
         }
-
     }
 
     pub fn run(&mut self) {
@@ -26,7 +22,6 @@ impl Cpu {
         while self.is_finished().not() {
             self.step()
         }
-
     }
 
     fn is_finished(&mut self) -> bool {
@@ -53,7 +48,6 @@ impl Cpu {
     }
 
     pub fn execute_insn(&mut self, insn: Instruction) {
-
         match insn.opcode {
             OpCode::ADC => self.adc(insn.mode),
             OpCode::AND => self.and(insn.mode),
@@ -120,267 +114,183 @@ impl Cpu {
             OpCode::TXS => self.txs(insn.mode),
             OpCode::TYA => self.tya(insn.mode),
         }
-
     }
     // TODO: implement the instructions
     fn adc(&mut self, mode: AddressingMode) {
+        match mode {
+            AddressingMode::Absolute => {
+                let operand = self
+                    .memory
+                    .read_byte(self.memory.read_word(self.registers.pc + 1));
 
-            match mode {
-
-                AddressingMode::Absolute => {
-
-                    let operand = self.memory.read_byte(self.memory.read_word(self.registers.pc+1) as u16);
-
-                    self.registers.a = self.registers.a + operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
-                }
-
-                AddressingMode::AbsoluteX => {
-
-                    let specified_addr = self.memory.read_byte(self.memory.read_word(self.registers.pc+1) as u16);
-                    let sum_addr = specified_addr + self.registers.x;
-                    let operand = self.memory.read_byte(sum_addr as u16);
-
-                    self.registers.a = self.registers.a + operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
-                }
-
-                AddressingMode::AbsoluteY => {
-                    let specified_addr = self.memory.read_byte(self.memory.read_word(self.registers.pc+1) as u16);
-                    let sum_addr = specified_addr + self.registers.y;
-                    let operand = self.memory.read_byte(sum_addr as u16);
-
-                    self.registers.a = self.registers.a + operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
-                }
-
-                AddressingMode::Immediate => {
-                    let operand = self.memory.read_byte(self.registers.pc+1);
-                }
-
-                AddressingMode::ZeroPage => {
-                    let operand = self.memory.read_byte(self.memory.read_byte(self.registers.pc+1) as u16);
-
-                    self.registers.a = self.registers.a + operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
-                }
-
-                AddressingMode::ZeroPageX => {
-                    let specified_addr = self.memory.read_byte(self.registers.pc+1) as u16;
-                    let sum_addr = specified_addr + self.registers.x as u16;
-
-                    
-                }
-
+                self.registers.a += operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
             }
 
-    }
-
-    fn and(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn asl(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn bcc(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn bcs(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn beq(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn bit(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn bmi(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn bne(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn bpl(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn brk(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn bvc(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn bvs(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn clc(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn cld(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn cli(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn clv(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn cmp(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn cpx(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn cpy(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn dcp(&mut self, mode: AddressingMode) {
+            AddressingMode::AbsoluteX => {
+                let specified_addr = self
+                    .memory
+                    .read_byte(self.memory.read_word(self.registers.pc + 1) as u16);
+                let sum_addr = specified_addr + self.registers.x;
+                let operand = self.memory.read_byte(sum_addr as u16);
 
-    }
-
-    fn dec(&mut self, mode: AddressingMode) {
-
-    }
-
-    fn dex(&mut self, mode: AddressingMode) {
-
-    }
-    fn dey(&mut self, mode: AddressingMode) {
-
-    }
-    fn eor(&mut self, mode: AddressingMode) {
-
-    }
-    fn inc(&mut self, mode: AddressingMode) {
-
-    }
-    fn inx(&mut self, mode: AddressingMode) {
-
-    }
-    fn iny(&mut self, mode: AddressingMode) {
-
-    }
-    fn isb(&mut self, mode: AddressingMode) {
-
-    }
-    fn jmp(&mut self, mode: AddressingMode) {
-
-    }
-    fn jsr(&mut self, mode: AddressingMode) {
-
-    }
-    fn lax(&mut self, mode: AddressingMode) {
-
-    }
-    fn lda(&mut self, mode: AddressingMode) {
-
-    }
-    fn ldx(&mut self, mode: AddressingMode) {
-
-    }
-    fn ldy(&mut self, mode: AddressingMode) {
+                self.registers.a += operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
+            }
 
-    }
-    fn lsr(&mut self, mode: AddressingMode) {
-
-    }
-    fn nop(&mut self, mode: AddressingMode) {
+            AddressingMode::AbsoluteY => {
+                let specified_addr = self
+                    .memory
+                    .read_byte(self.memory.read_word(self.registers.pc + 1) as u16);
+                let sum_addr = specified_addr + self.registers.y;
+                let operand = self.memory.read_byte(sum_addr as u16);
 
-    }
-    fn ora(&mut self, mode: AddressingMode) {
+                self.registers.a += operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
+            }
 
-    }
-    fn pha(&mut self, mode: AddressingMode) {
+            AddressingMode::Immediate => {
+                let operand = self.memory.read_byte(self.registers.pc + 1);
 
-    }
-    fn php(&mut self, mode: AddressingMode) {
+                // i dont know if it is right but i dont care
+                self.registers.a += operand + self.registers.get_flag(StatusFlag::Carry) as u8;
+            }
 
-    }
-    fn pla(&mut self, mode: AddressingMode) {
+            AddressingMode::Indirect => {
+                let address = self.memory.read_byte(self.registers.pc + 1) as u16;
 
-    }
-    fn plp(&mut self, mode: AddressingMode) {
+                let operand = self.memory.read_byte(address);
 
-    }
-    fn rla(&mut self, mode: AddressingMode) {
+                self.registers.a += operand + self.registers.get_flag(StatusFlag::Carry) as u8;
+            },
 
-    }
-    fn rol(&mut self, mode: AddressingMode) {
+            AddressingMode::IndirectIndexedX => {
+                let specified_addr = self.memory.read_word(self.registers.pc + 1);
 
-    }
-    fn ror(&mut self, mode: AddressingMode) {
+                let operand = self
+                    .memory
+                    .read_byte(specified_addr + self.registers.x as u16);
 
-    }
-    fn rra(&mut self, mode: AddressingMode) {
+                self.registers.a += operand + self.registers.get_flag(StatusFlag::Carry) as u8;
+            }
 
-    }
-    fn rti(&mut self, mode: AddressingMode) {
+            AddressingMode::IndirectIndexedY => {
+                let specified_addr = self.memory.read_word(self.registers.pc + 1);
 
-    }
-    fn rts(&mut self, mode: AddressingMode) {
+                let operand = self
+                    .memory
+                    .read_byte(specified_addr + self.registers.y as u16);
 
-    }
-    fn sax(&mut self, mode: AddressingMode) {
+                self.registers.a += operand + self.registers.get_flag(StatusFlag::Carry) as u8;
+            }
 
-    }
-    fn sbc(&mut self, mode: AddressingMode) {
+            AddressingMode::ZeroPage => {
+                let operand = self
+                    .memory
+                    .read_byte(self.memory.read_byte(self.registers.pc + 1) as u16);
 
-    }
-    fn sec(&mut self, mode: AddressingMode) {
+                self.registers.a += operand + (self.registers.get_flag(StatusFlag::Carry) as u8);
+            }
 
-    }
-    fn sed(&mut self, mode: AddressingMode) {
+            AddressingMode::ZeroPageX => {
+                let specified_addr = self.memory.read_byte(self.registers.pc + 1) as u16;
+                let sum_addr = specified_addr + self.registers.x as u16;
 
-    }
-    fn sei(&mut self, mode: AddressingMode) {
+                self.registers.a += self.memory.read_byte(sum_addr)
+                    + (self.registers.get_flag(StatusFlag::Carry) as u8);
+            }
 
-    }
-    fn slo(&mut self, mode: AddressingMode) {
+            AddressingMode::ZeroPageY => {
+                let specified_addr = self.memory.read_byte(self.registers.pc + 1) as u16;
+                let sum_addr = specified_addr + self.registers.y as u16;
 
-    }
-    fn sre(&mut self, mode: AddressingMode) {
+                self.registers.a += self.memory.read_byte(sum_addr)
+                    + (self.registers.get_flag(StatusFlag::Carry) as u8);
+            }
 
+            _ => unreachable!("Invalid addressing mode {:?} for adc", mode),
+        }
     }
-    fn sta(&mut self, mode: AddressingMode) {
 
-    }
-    fn stx(&mut self, mode: AddressingMode) {
+    fn and(&mut self, mode: AddressingMode) {}
 
-    }
-    fn sty(&mut self, mode: AddressingMode) {
+    fn asl(&mut self, mode: AddressingMode) {}
 
-    }
-    fn tax(&mut self, mode: AddressingMode) {
+    fn bcc(&mut self, mode: AddressingMode) {}
 
-    }
-    fn tay(&mut self, mode: AddressingMode) {
+    fn bcs(&mut self, mode: AddressingMode) {}
 
-    }
-    fn tsx(&mut self, mode: AddressingMode) {
+    fn beq(&mut self, mode: AddressingMode) {}
 
-    }
-    fn txa(&mut self, mode: AddressingMode) {
+    fn bit(&mut self, mode: AddressingMode) {}
 
-    }
-    fn txs(&mut self, mode: AddressingMode) {
+    fn bmi(&mut self, mode: AddressingMode) {}
 
-    }
-    fn tya(&mut self, mode: AddressingMode) {
+    fn bne(&mut self, mode: AddressingMode) {}
 
-    }
+    fn bpl(&mut self, mode: AddressingMode) {}
 
+    fn brk(&mut self, mode: AddressingMode) {}
+
+    fn bvc(&mut self, mode: AddressingMode) {}
+
+    fn bvs(&mut self, mode: AddressingMode) {}
+
+    fn clc(&mut self, mode: AddressingMode) {}
+
+    fn cld(&mut self, mode: AddressingMode) {}
+
+    fn cli(&mut self, mode: AddressingMode) {}
+
+    fn clv(&mut self, mode: AddressingMode) {}
+
+    fn cmp(&mut self, mode: AddressingMode) {}
+
+    fn cpx(&mut self, mode: AddressingMode) {}
+
+    fn cpy(&mut self, mode: AddressingMode) {}
+
+    fn dcp(&mut self, mode: AddressingMode) {}
+
+    fn dec(&mut self, mode: AddressingMode) {}
+
+    fn dex(&mut self, mode: AddressingMode) {}
+    fn dey(&mut self, mode: AddressingMode) {}
+    fn eor(&mut self, mode: AddressingMode) {}
+    fn inc(&mut self, mode: AddressingMode) {}
+    fn inx(&mut self, mode: AddressingMode) {}
+    fn iny(&mut self, mode: AddressingMode) {}
+    fn isb(&mut self, mode: AddressingMode) {}
+    fn jmp(&mut self, mode: AddressingMode) {}
+    fn jsr(&mut self, mode: AddressingMode) {}
+    fn lax(&mut self, mode: AddressingMode) {}
+    fn lda(&mut self, mode: AddressingMode) {}
+    fn ldx(&mut self, mode: AddressingMode) {}
+    fn ldy(&mut self, mode: AddressingMode) {}
+    fn lsr(&mut self, mode: AddressingMode) {}
+    fn nop(&mut self, mode: AddressingMode) {}
+    fn ora(&mut self, mode: AddressingMode) {}
+    fn pha(&mut self, mode: AddressingMode) {}
+    fn php(&mut self, mode: AddressingMode) {}
+    fn pla(&mut self, mode: AddressingMode) {}
+    fn plp(&mut self, mode: AddressingMode) {}
+    fn rla(&mut self, mode: AddressingMode) {}
+    fn rol(&mut self, mode: AddressingMode) {}
+    fn ror(&mut self, mode: AddressingMode) {}
+    fn rra(&mut self, mode: AddressingMode) {}
+    fn rti(&mut self, mode: AddressingMode) {}
+    fn rts(&mut self, mode: AddressingMode) {}
+    fn sax(&mut self, mode: AddressingMode) {}
+    fn sbc(&mut self, mode: AddressingMode) {}
+    fn sec(&mut self, mode: AddressingMode) {}
+    fn sed(&mut self, mode: AddressingMode) {}
+    fn sei(&mut self, mode: AddressingMode) {}
+    fn slo(&mut self, mode: AddressingMode) {}
+    fn sre(&mut self, mode: AddressingMode) {}
+    fn sta(&mut self, mode: AddressingMode) {}
+    fn stx(&mut self, mode: AddressingMode) {}
+    fn sty(&mut self, mode: AddressingMode) {}
+    fn tax(&mut self, mode: AddressingMode) {}
+    fn tay(&mut self, mode: AddressingMode) {}
+    fn tsx(&mut self, mode: AddressingMode) {}
+    fn txa(&mut self, mode: AddressingMode) {}
+    fn txs(&mut self, mode: AddressingMode) {}
+    fn tya(&mut self, mode: AddressingMode) {}
 }
