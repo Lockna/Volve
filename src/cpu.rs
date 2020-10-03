@@ -52,6 +52,14 @@ impl Cpu {
             OpCode::ADC => self.adc(insn.mode),
             OpCode::AND => self.and(insn.mode),
             OpCode::ASL => self.asl(insn.mode),
+            OpCode::BBR0 => self.bbr0(insn.mode),
+            OpCode::BBR1 => self.bbr1(insn.mode),
+            OpCode::BBR2 => self.bbr2(insn.mode),
+            OpCode::BBR3 => self.bbr3(insn.mode),
+            OpCode::BBR4 => self.bbr4(insn.mode),
+            OpCode::BBR5 => self.bbr5(insn.mode),
+            OpCode::BBR6 => self.bbr6(insn.mode),
+            OpCode::BBR7 => self.bbr7(insn.mode),
             OpCode::BCC => self.bcc(insn.mode),
             OpCode::BCS => self.bcs(insn.mode),
             OpCode::BEQ => self.beq(insn.mode),
@@ -92,6 +100,14 @@ impl Cpu {
             OpCode::PLA => self.pla(insn.mode),
             OpCode::PLP => self.plp(insn.mode),
             OpCode::RLA => self.rla(insn.mode),
+            OpCode::RMB0 => self.rmb0(insn.mode),
+            OpCode::RMB1 => self.rmb1(insn.mode),
+            OpCode::RMB2 => self.rmb2(insn.mode),
+            OpCode::RMB3 => self.rmb3(insn.mode),
+            OpCode::RMB4 => self.rmb4(insn.mode),
+            OpCode::RMB5 => self.rmb5(insn.mode),
+            OpCode::RMB6 => self.rmb6(insn.mode),
+            OpCode::RMB7 => self.rmb7(insn.mode),
             OpCode::ROL => self.rol(insn.mode),
             OpCode::ROR => self.ror(insn.mode),
             OpCode::RRA => self.rra(insn.mode),
@@ -109,6 +125,8 @@ impl Cpu {
             OpCode::STY => self.sty(insn.mode),
             OpCode::TAX => self.tax(insn.mode),
             OpCode::TAY => self.tay(insn.mode),
+            OpCode::TRB => self.trb(insn.mode),
+            OpCode::TSB => self.tsb(insn.mode),
             OpCode::TSX => self.tsx(insn.mode),
             OpCode::TXA => self.txa(insn.mode),
             OpCode::TXS => self.txs(insn.mode),
@@ -159,9 +177,9 @@ impl Cpu {
                 let operand = self.memory.read_byte(address);
 
                 self.registers.a += operand + self.registers.get_flag(StatusFlag::Carry) as u8;
-            },
+            }
 
-            AddressingMode::IndirectIndexedX => {
+            AddressingMode::IndexedIndirectX => {
                 let specified_addr = self.memory.read_word(self.registers.pc + 1);
 
                 let operand = self
@@ -209,9 +227,150 @@ impl Cpu {
         }
     }
 
-    fn and(&mut self, mode: AddressingMode) {}
+    fn and(&mut self, mode: AddressingMode) {
+        match mode {
+            AddressingMode::Absolute => {
+                let operand = self
+                    .memory
+                    .read_byte(self.memory.read_word(self.registers.pc + 1));
 
-    fn asl(&mut self, mode: AddressingMode) {}
+                self.registers.a &= operand;
+            }
+
+            AddressingMode::AbsoluteX => {
+                let specified_addr = self
+                    .memory
+                    .read_byte(self.memory.read_word(self.registers.pc + 1) as u16);
+                let sum_addr = specified_addr + self.registers.x;
+                let operand = self.memory.read_byte(sum_addr as u16);
+
+                self.registers.a &= operand;
+            }
+
+            AddressingMode::AbsoluteY => {
+                let specified_addr = self
+                    .memory
+                    .read_byte(self.memory.read_word(self.registers.pc + 1) as u16);
+                let sum_addr = specified_addr + self.registers.y;
+                let operand = self.memory.read_byte(sum_addr as u16);
+
+                self.registers.a += operand;
+            }
+
+            AddressingMode::Immediate => {
+                let operand = self.memory.read_byte(self.registers.pc + 1);
+
+                // i dont know if it is right but i dont care
+                self.registers.a &= operand;
+            }
+
+            AddressingMode::Indirect => {
+                let address = self.memory.read_byte(self.registers.pc + 1) as u16;
+
+                let operand = self.memory.read_byte(address);
+
+                self.registers.a &= operand;
+            }
+
+            AddressingMode::IndexedIndirectX => {
+                let specified_addr = self.memory.read_word(self.registers.pc + 1);
+
+                let operand = self
+                    .memory
+                    .read_byte(specified_addr + self.registers.x as u16);
+
+                self.registers.a &= operand;
+            }
+
+            AddressingMode::IndirectIndexedY => {
+                let specified_addr = self.memory.read_word(self.registers.pc + 1);
+
+                let operand = self
+                    .memory
+                    .read_byte(specified_addr + self.registers.y as u16);
+
+                self.registers.a &= operand;
+            }
+
+            AddressingMode::ZeroPage => {
+                let operand = self
+                    .memory
+                    .read_byte(self.memory.read_byte(self.registers.pc + 1) as u16);
+
+                self.registers.a &= operand;
+            }
+
+            AddressingMode::ZeroPageX => {
+                let specified_addr = self.memory.read_byte(self.registers.pc + 1) as u16;
+                let sum_addr = specified_addr + self.registers.x as u16;
+
+                self.registers.a &= self.memory.read_byte(sum_addr);
+            }
+
+            AddressingMode::ZeroPageY => {
+                let specified_addr = self.memory.read_byte(self.registers.pc + 1) as u16;
+                let sum_addr = specified_addr + self.registers.y as u16;
+
+                self.registers.a &= self.memory.read_byte(sum_addr);
+            }
+
+            _ => unreachable!("Invalid addressing mode {:?} for and", mode),
+        }
+    }
+
+    fn asl(&mut self, mode: AddressingMode) {
+        match mode {
+            // it should be Absolute RMW but i dont know the difference
+            AddressingMode::Absolute => {
+                let addr = self.memory.read_word(self.registers.pc + 1);
+
+                self.memory
+                    .write_byte(addr, self.memory.read_byte(addr) << 1);
+            }
+
+            AddressingMode::AbsoluteX => {
+                let specified_addr = self.memory.read_word(self.registers.pc + 1) as u16;
+                let sum_addr = specified_addr + self.registers.x as u16;
+
+                self.memory
+                    .write_byte(sum_addr, self.memory.read_byte(sum_addr) << 1);
+            }
+
+            AddressingMode::Accumulator => {
+                self.registers.a <<= 1;
+            }
+
+            AddressingMode::ZeroPage => {
+                let addr = self.memory.read_byte(self.registers.pc + 1) as u16;
+
+                self.memory.write_byte(addr, self.memory.read_byte(addr) << 1);
+            }
+
+            AddressingMode::ZeroPageX => {
+                let addr = (self.memory.read_byte(self.registers.pc + 1) + self.registers.x) as u16;
+
+                self.memory.write_byte(addr, self.memory.read_byte(addr) << 1);
+            }
+
+            _ => unreachable!("Invalid addressing mode {:?} for asl", mode),
+        }
+    }
+
+    fn bbr0(&mut self, mode: AddressingMode) {}
+
+    fn bbr1(&mut self, mode: AddressingMode) {}
+
+    fn bbr2(&mut self, mode: AddressingMode) {}
+
+    fn bbr3(&mut self, mode: AddressingMode) {}
+
+    fn bbr4(&mut self, mode: AddressingMode) {}
+
+    fn bbr5(&mut self, mode: AddressingMode) {}
+
+    fn bbr6(&mut self, mode: AddressingMode) {}
+
+    fn bbr7(&mut self, mode: AddressingMode) {}
 
     fn bcc(&mut self, mode: AddressingMode) {}
 
@@ -272,6 +431,14 @@ impl Cpu {
     fn pla(&mut self, mode: AddressingMode) {}
     fn plp(&mut self, mode: AddressingMode) {}
     fn rla(&mut self, mode: AddressingMode) {}
+    fn rmb0(&mut self, mode: AddressingMode) {}
+    fn rmb1(&mut self, mode: AddressingMode) {}
+    fn rmb2(&mut self, mode: AddressingMode) {}
+    fn rmb3(&mut self, mode: AddressingMode) {}
+    fn rmb4(&mut self, mode: AddressingMode) {}
+    fn rmb5(&mut self, mode: AddressingMode) {}
+    fn rmb6(&mut self, mode: AddressingMode) {}
+    fn rmb7(&mut self, mode: AddressingMode) {}
     fn rol(&mut self, mode: AddressingMode) {}
     fn ror(&mut self, mode: AddressingMode) {}
     fn rra(&mut self, mode: AddressingMode) {}
@@ -289,6 +456,8 @@ impl Cpu {
     fn sty(&mut self, mode: AddressingMode) {}
     fn tax(&mut self, mode: AddressingMode) {}
     fn tay(&mut self, mode: AddressingMode) {}
+    fn trb(&mut self, mode: AddressingMode) {}
+    fn tsb(&mut self, mode: AddressingMode) {}
     fn tsx(&mut self, mode: AddressingMode) {}
     fn txa(&mut self, mode: AddressingMode) {}
     fn txs(&mut self, mode: AddressingMode) {}
