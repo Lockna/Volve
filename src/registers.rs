@@ -20,8 +20,6 @@ pub struct Registers {
 }
 
 impl Registers {
-
-    
     pub fn set_flag(&mut self, flag: StatusFlag, mode: bool) {
         if mode {
             self.p |= flag as u8;
@@ -34,11 +32,8 @@ impl Registers {
         (self.p & flag as u8) != 0
     }
 
-
     pub fn new() -> Registers {
-
         Registers {
-
             a: 0,
             x: 0,
             y: 0,
@@ -46,9 +41,6 @@ impl Registers {
             p: 0x34,
             sp: 0xFF,
             pc: 0,
-
         }
-
     }
-
 }
