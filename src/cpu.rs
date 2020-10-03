@@ -52,14 +52,22 @@ impl Cpu {
             OpCode::ADC => self.adc(insn.mode),
             OpCode::AND => self.and(insn.mode),
             OpCode::ASL => self.asl(insn.mode),
-            OpCode::BBR0 => self.bbr0(insn.mode),
-            OpCode::BBR1 => self.bbr1(insn.mode),
-            OpCode::BBR2 => self.bbr2(insn.mode),
-            OpCode::BBR3 => self.bbr3(insn.mode),
-            OpCode::BBR4 => self.bbr4(insn.mode),
-            OpCode::BBR5 => self.bbr5(insn.mode),
-            OpCode::BBR6 => self.bbr6(insn.mode),
-            OpCode::BBR7 => self.bbr7(insn.mode),
+            OpCode::BBR0 => self.bbr(insn.mode, 0),
+            OpCode::BBR1 => self.bbr(insn.mode, 1),
+            OpCode::BBR2 => self.bbr(insn.mode, 2),
+            OpCode::BBR3 => self.bbr(insn.mode, 3),
+            OpCode::BBR4 => self.bbr(insn.mode, 4),
+            OpCode::BBR5 => self.bbr(insn.mode, 5),
+            OpCode::BBR6 => self.bbr(insn.mode, 6),
+            OpCode::BBR7 => self.bbr(insn.mode, 7),
+            OpCode::BBS0 => self.bbs(insn.mode, 0),
+            OpCode::BBS1 => self.bbs(insn.mode, 1),
+            OpCode::BBS2 => self.bbs(insn.mode, 2),
+            OpCode::BBS3 => self.bbs(insn.mode, 3),
+            OpCode::BBS4 => self.bbs(insn.mode, 4),
+            OpCode::BBS5 => self.bbs(insn.mode, 5),
+            OpCode::BBS6 => self.bbs(insn.mode, 6),
+            OpCode::BBS7 => self.bbs(insn.mode, 7),
             OpCode::BCC => self.bcc(insn.mode),
             OpCode::BCS => self.bcs(insn.mode),
             OpCode::BEQ => self.beq(insn.mode),
@@ -343,38 +351,64 @@ impl Cpu {
             AddressingMode::ZeroPage => {
                 let addr = self.memory.read_byte(self.registers.pc + 1) as u16;
 
-                self.memory.write_byte(addr, self.memory.read_byte(addr) << 1);
+                self.memory
+                    .write_byte(addr, self.memory.read_byte(addr) << 1);
             }
 
             AddressingMode::ZeroPageX => {
                 let addr = (self.memory.read_byte(self.registers.pc + 1) + self.registers.x) as u16;
 
-                self.memory.write_byte(addr, self.memory.read_byte(addr) << 1);
+                self.memory
+                    .write_byte(addr, self.memory.read_byte(addr) << 1);
             }
 
             _ => unreachable!("Invalid addressing mode {:?} for asl", mode),
         }
     }
 
-    fn bbr0(&mut self, mode: AddressingMode) {}
+    fn bbr(&mut self, mode: AddressingMode, bit: u8) {
+        if (self.registers.p & 1 << bit) == 0 {
+            let rel_jmp_addr = self.memory.read_byte(self.registers.pc + 1) as i8;
+            if rel_jmp_addr < 0 {
+                self.registers.pc -= rel_jmp_addr as u16;
+            } else {
+                self.registers.pc += rel_jmp_addr as u16;
+            }
+        }
+    }
 
-    fn bbr1(&mut self, mode: AddressingMode) {}
+    fn bbs(&mut self, mode: AddressingMode, bit: u8) {
+        if (self.registers.p & 1 << bit) != 0 {
+            let rel_jmp_addr = self.memory.read_byte(self.registers.pc + 1) as i8;
+            if rel_jmp_addr < 0 {
+                self.registers.pc -= rel_jmp_addr as u16;
+            } else {
+                self.registers.pc += rel_jmp_addr as u16;
+            }
+        }
+    }
 
-    fn bbr2(&mut self, mode: AddressingMode) {}
+    fn bcc(&mut self, mode: AddressingMode) {
+        if !self.registers.get_flag(StatusFlag::Carry) {
+            let rel_jmp_addr = self.memory.read_byte(self.registers.pc + 1) as i8;
+            if rel_jmp_addr < 0 {
+                self.registers.pc -= rel_jmp_addr as u16;
+            } else {
+                self.registers.pc += rel_jmp_addr as u16;
+            }
+        }
+    }
 
-    fn bbr3(&mut self, mode: AddressingMode) {}
-
-    fn bbr4(&mut self, mode: AddressingMode) {}
-
-    fn bbr5(&mut self, mode: AddressingMode) {}
-
-    fn bbr6(&mut self, mode: AddressingMode) {}
-
-    fn bbr7(&mut self, mode: AddressingMode) {}
-
-    fn bcc(&mut self, mode: AddressingMode) {}
-
-    fn bcs(&mut self, mode: AddressingMode) {}
+    fn bcs(&mut self, mode: AddressingMode) {
+        if self.registers.get_flag(StatusFlag::Carry) {
+            let rel_jmp_addr = self.memory.read_byte(self.registers.pc + 1) as i8;
+            if rel_jmp_addr < 0 {
+                self.registers.pc -= rel_jmp_addr as u16;
+            } else {
+                self.registers.pc += rel_jmp_addr as u16;
+            }
+        }
+    }
 
     fn beq(&mut self, mode: AddressingMode) {}
 
