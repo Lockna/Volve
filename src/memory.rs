@@ -18,7 +18,6 @@ pub struct Memory {
 }
 
 impl Memory {
-
     pub fn new() -> Memory {
         Memory {
             bytes: [0; MEMORY_SIZE],
@@ -45,13 +44,8 @@ impl Memory {
     }
 
     pub fn print_mem(&self) {
-
         for byte in self.bytes.iter() {
-
             println!("{:#04x}", byte);
-
         }
-
     }
-
 }
